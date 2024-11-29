@@ -1,21 +1,23 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 #include <SPI.h>
+#include "Common.h"
+
 
 #define CE_PIN  9
 #define CSN_PIN 10
-#define INTERVAL_MS_TRANSMISSION 250 
-#define CHANNEL_OFFSET 56
+
 const byte address[6] = "00001"; 
-char data[100] = "hi";
+
 struct JoystickPinConfig {
   int x_axis = A0;
   int y_axis = A1;
   int up = 2;
-  int down =4;
+  int down = 4;
   int left = 5;
   int right = 3;
 };
+
 JoystickPinConfig joystickPinConfig;
 
 struct Joystick{
@@ -26,16 +28,18 @@ struct Joystick{
   int left;
   int right;
 };
+
 Joystick joystick;
 
-struct Cords{
-  int x;
-  int y;
-};
 Cords cords;
 
 RF24 radio(CE_PIN, CSN_PIN);
 
+void setup() {
+  Serial.begin(9600); 
+  setupRadio();
+	setupJoystick();
+}
 void setupRadio(){
   radio.begin(); 
   radio.setAutoAck(false);  
@@ -57,11 +61,14 @@ void setupJoystick(){
   digitalWrite(joystickPinConfig.left, LOW);
   digitalWrite(joystickPinConfig.right, LOW);
 }
-void setup() {
-  Serial.begin(9600); 
-  setupRadio();
-	setupJoystick();
+
+void loop() {
+  // put your main code here, to run repeatedly:
+    printInputs();
+    radio.write(&cords, sizeof(cords));
+    delay(200);
 }
+
 void printInputs(){
   cords.x = analogRead(joystickPinConfig.x_axis);
   cords.y = analogRead(joystickPinConfig.y_axis);
@@ -69,13 +76,4 @@ void printInputs(){
   Serial.print(cords.x);
   Serial.print(" Y = ");  
   Serial.println(cords.y);
-}
-
-
-
-void loop() {
-  // put your main code here, to run repeatedly:
-    printInputs();
-    radio.write(&cords, sizeof(cords));
-    delay(200);
 }

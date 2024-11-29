@@ -1,19 +1,16 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 #include <SPI.h>
+#include "Common.h"
 
 #define CE_PIN 7 
 #define CSN_PIN 8
-#define CHANNEL_OFFSET 56
+const byte  address[6];
 
-const byte address[6] = "00001";
 RF24 radio(CE_PIN, CSN_PIN);
-char data[10];
-struct Cords{
-  int x;
-  int y;
-};
+
 Cords cords;
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
