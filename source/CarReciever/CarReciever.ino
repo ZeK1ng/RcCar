@@ -7,9 +7,9 @@
 #define CSN_PIN 8
 const byte  address[6];
 const int DELAY = 1000;
-const STICK_X_CENTER = 330;
-const STICK_Y_CENTER = 330;
-const STICK_MARGIN =  10;
+const int STICK_X_CENTER = 330;
+const int STICK_Y_CENTER = 330;
+const int STICK_MARGIN =  10;
 
 
 RF24 radio(CE_PIN, CSN_PIN);
