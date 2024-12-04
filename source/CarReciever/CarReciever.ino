@@ -5,8 +5,8 @@
 
 #define CE_PIN 7 
 #define CSN_PIN 8
-const byte  address[6];
-const int DELAY = 1000;
+const byte address[6] = "00001"; 
+const int DELAY = 100;
 const int STICK_X_CENTER = 330;
 const int STICK_Y_CENTER = 330;
 const int STICK_MARGIN =  10;
@@ -28,7 +28,7 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   setupMotor();
-  // setupRadio();
+  setupRadio();
 }
 void setupMotor(){
   pinMode(motorBridge.motorRightPin1,OUTPUT);
@@ -51,9 +51,10 @@ void setupRadio(){
 
 void loop() {
   // put your main code here, to run repeatedly:
+  // moveForward();
+  // moveBackward();
   listenToRadio();
-  handleInput();
-  delay(DELAY);
+  // delay(DELAY);
 }
 
 void printCords(){
@@ -64,21 +65,25 @@ void printCords(){
 }
 
 void handleInput(){
-  if(cords.x > STICK_X_CENTER - STICK_MARGIN){
-    printCords();
-    moveForward();
+  if(cords.x>= STICK_X_CENTER-STICK_MARGIN && cords.x <= STICK_X_CENTER+STICK_MARGIN && cords.y >= STICK_Y_CENTER-STICK_MARGIN && cords.y <= STICK_Y_CENTER + STICK_MARGIN){
+    rightStop();
+    leftStop();
   }else
-  if(cords.x < STICK_X_CENTER - STICK_MARGIN){
-    printCords();
-    moveBackward();
-  }else
-  if(cords.y > STICK_Y_CENTER + STICK_MARGIN){
-    printCords();
+  if(cords.x > STICK_X_CENTER + STICK_MARGIN){
+    Serial.println("moving right");
     moveRight();
   }else
-  if(cords.y < STICK_Y_CENTER - STICK_MARGIN){
-    printCords();
+  if(cords.x < STICK_X_CENTER - STICK_MARGIN){
+    Serial.println("moving left");
     moveLeft();
+  }else
+  if(cords.y > STICK_Y_CENTER + STICK_MARGIN){
+    Serial.println("moving forward");
+    moveForward();
+  }else
+  if(cords.y < STICK_Y_CENTER - STICK_MARGIN){
+    Serial.println("moving back");
+    moveBackward();
   }
 }
 
@@ -131,12 +136,15 @@ void moveRight(){
   rightStop();
   leftForward();
 }
+void stop(){
+  rightStop();
+  leftStop();
+}
 
 void listenToRadio(){
   if(radio.available()){
-    while(radio.available()){
-        radio.read(&cords, sizeof(cords));
-    }
+    radio.read(&cords, sizeof(cords));
+    handleInput();
     printCords();
   }
 }
