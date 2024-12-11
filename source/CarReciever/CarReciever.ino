@@ -6,7 +6,7 @@
 #define CE_PIN 7 
 #define CSN_PIN 8
 const byte address[6] = "00001"; 
-const int DELAY = 100;
+const int DELAY = 1;
 const int STICK_X_CENTER = 330;
 const int STICK_Y_CENTER = 330;
 const int STICK_MARGIN =  10;
@@ -43,18 +43,16 @@ void setupRadio(){
   radio.begin();
   radio.setAutoAck(false);  
   radio.setChannel(CHANNEL_OFFSET);
-  radio.setPALevel (RF24_PA_MIN); //transmitter power level. To choose RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX
-	radio.setDataRate(RF24_250KBPS); //(RF24_250KBPS|RF24_1MBPS|RF24_2MBPS) 
+  radio.setPALevel (RF24_PA_LOW); //transmitter power level. To choose RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX
+	radio.setDataRate(RF24_1MBPS); //(RF24_250KBPS|RF24_1MBPS|RF24_2MBPS) 
   radio.openReadingPipe(1,address);
   radio.startListening();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // moveForward();
-  // moveBackward();
   listenToRadio();
-  // delay(DELAY);
+  delay(DELAY);
 }
 
 void printCords(){
@@ -66,23 +64,18 @@ void printCords(){
 
 void handleInput(){
   if(cords.x>= STICK_X_CENTER-STICK_MARGIN && cords.x <= STICK_X_CENTER+STICK_MARGIN && cords.y >= STICK_Y_CENTER-STICK_MARGIN && cords.y <= STICK_Y_CENTER + STICK_MARGIN){
-    rightStop();
-    leftStop();
+    stop(); 
   }else
   if(cords.x > STICK_X_CENTER + STICK_MARGIN){
-    Serial.println("moving right");
     moveRight();
   }else
   if(cords.x < STICK_X_CENTER - STICK_MARGIN){
-    Serial.println("moving left");
     moveLeft();
   }else
   if(cords.y > STICK_Y_CENTER + STICK_MARGIN){
-    Serial.println("moving forward");
     moveForward();
   }else
   if(cords.y < STICK_Y_CENTER - STICK_MARGIN){
-    Serial.println("moving back");
     moveBackward();
   }
 }
@@ -145,6 +138,6 @@ void listenToRadio(){
   if(radio.available()){
     radio.read(&cords, sizeof(cords));
     handleInput();
-    printCords();
+    // printCords();
   }
 }
